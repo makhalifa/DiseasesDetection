@@ -13,10 +13,10 @@ app  =  FastAPI()
 host = "127.0.0.1"
 port = 8000
 
-with open("cancer\cancer.pkl", "rb") as f:
+with open("cancer/cancer.pkl", "rb") as f:
     Cancer_model = pickle.load(f)
 
-pneumonia_model = tf.keras.models.load_model("pneumonia\model.h5")
+pneumonia_model = tf.keras.models.load_model("pneumonia/model.h5")
 
 @app.get( "/" )
 def  read_root():
