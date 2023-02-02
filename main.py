@@ -17,6 +17,7 @@ with open("cancer/cancer.pkl", "rb") as f:
     Cancer_model = pickle.load(f)
 
 pneumonia_model = tf.keras.models.load_model("pneumonia/model.h5")
+Tuberculosis_model = tf.keras.models.load_model("tuberculosis/tuberculosis.h5")
 
 @app.get( "/" )
 def  read_root():
@@ -95,6 +96,22 @@ async def predict_pneumonia(image: bytes = File(...)):
     prediction = pneumonia_model.predict(image)
     prediction = prediction[0][0]
     return {"prediction": f"{prediction}"}
+
+@app.post( "/tuberculosis/predict" )
+async def predict_tuberculosis(image: bytes = File(...)):
+    # image preprocessing
+    image = tf.image.decode_jpeg(image, channels=3)
+    image = tf.image.resize(image, [300, 300])
+    image = np.array(image)
+    image = image.reshape(1, 300, 300, 3)
+    image = image / 255.0
+    image = image.astype(np.float32)
+    image = tf.convert_to_tensor(image)
+    image = tf.cast(image, tf.float32)
+    
+    prediction = Tuberculosis_model.predict(image)
+    prediction = int(prediction[0][0])
+    return {"prediction":f"{prediction}"}
 
 if __name__ ==  "__main__" :
     uvicorn.run( "app:app" , host  , port , reload=True)
